@@ -1,0 +1,17 @@
+# IDE
+.vim/
+.idea/
+
+# files
+*.log
+.DS_Store
+
+# Python
+*.py[cod]
+__pycache__/
+.pytest_cache/
+
+# build
+output/
+dist/
+build/
