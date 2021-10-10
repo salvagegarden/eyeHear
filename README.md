@@ -6,16 +6,20 @@ A techForGood project to display speech-to-text on a wearable low-cost device.
 
 <details>
   <summary>Install Python</summary>
-  ```bash
-  sudo apt-get install build-essential python-dev python-pip
-  ```
+  
+```bash
+sudo apt-get install build-essential python-dev python-pip
+```
+
 </details>
 
 <details>
   <summary>Install prerequisities</summary>
-  ```bash
-  pip install -i requirements.txt
-  ```
+
+```bash
+pip install -r requirements.txt
+```
+
 </details>
 
 ```bash
@@ -30,16 +34,22 @@ python eyeHear/main.py
 
 <details>
   <summary>Raspberry Pi Zero</summary>
-  1. 1GHz CPU
-  2. 512MB RAM
+
+- 1GHz CPU
+- 512MB RAM
+
 </details>
 
 <details>
   <summary>Display: SSD1306</summary>
-  1. Resolution: 128x64
+
+- Resolution: 128x64
+
 </details>
 
 <details>
   <summary>Microphone</summary>
-  1. USB Microphone
+
+- USB Microphone
+
 </details>
