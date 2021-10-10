@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +26,8 @@ import time
 import pyaudio
 from google.cloud import speech
 from six.moves import queue
+
+from draw import displayRedText, displayText
 
 # Audio recording parameters
 STREAMING_LIMIT = 240000  # 4 minutes
@@ -268,6 +269,8 @@ def speech_regonize():
             stream.audio_input = []
             audio_generator = stream.generate()
 
+            displayRedText("EyeHear ready:")
+            displayText(" Try it!")
             requests = (
                 speech.StreamingRecognizeRequest(audio_content=content)
                 for content in audio_generator
