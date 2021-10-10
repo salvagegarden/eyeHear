@@ -27,12 +27,18 @@ Example usage:
 
 import re
 import sys
+import textwrap
 import time
 
-from google.cloud import speech
+# Import the SSD1306 module.
+import adafruit_ssd1306
+import busio
 import pyaudio
-from six.moves import queue
 
+# Import all board pins.
+from board import SCL, SDA
+from google.cloud import speech
+from six.moves import queue
 
 ##Saad salvage.garden 16sep: added OLED display support
 ##Saad last update: 19sep - displayText for SST transcription output
@@ -43,13 +49,6 @@ from six.moves import queue
 # Basic example of clearing and drawing pixels on a SSD1306 OLED display.
 # This example and library is meant to work with Adafruit CircuitPython API.
 
-# Import all board pins.
-from board import SCL, SDA
-import busio
-
-# Import the SSD1306 module.
-import adafruit_ssd1306
-
 
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
@@ -57,7 +56,7 @@ i2c = busio.I2C(SCL, SDA)
 from PIL import Image, ImageDraw, ImageFont
 
 # Setting some variables for our reset pin etc.
-#RESET_PIN = digitalio.DigitalInOut(board.D4)
+# RESET_PIN = digitalio.DigitalInOut(board.D4)
 # Very important... This lets py-gaugette 'know' what pins to use in order to reset the display
 
 # Create the SSD1306 OLED class.
@@ -72,7 +71,6 @@ display = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
 display.fill(0)
 display.show()
 
-
 # Audio recording parameters
 STREAMING_LIMIT = 240000  # 4 minutes
 SAMPLE_RATE = 16000
@@ -81,20 +79,24 @@ CHUNK_SIZE = int(SAMPLE_RATE / 10)  # 100ms
 RED = "\033[0;31m"
 GREEN = "\033[0;32m"
 YELLOW = "\033[0;33m"
-SPINNER =  ["⠁","⠂","⠄","⡀","⢀","⠠","⠐","⠈"] #listener indicator = 8 frames
+SPINNER = ["⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"]  # listener indicator = 8 frames
 x = 0
 
-# OLED Display INIT 
+# OLED Display INIT
 
 # Create blank image for drawing.
 image = Image.new("1", (display.width, display.height))
 draw = ImageDraw.Draw(image)
 
 # Load a font in 2 different sizes.
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 10) # size 10 gives us 26 characters per screen
-tinyFont = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8) #size 8 gives us 30 characters per screen
+font = ImageFont.truetype(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 10
+)  # size 10 gives us 26 characters per screen
+tinyFont = ImageFont.truetype(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 8
+)  # size 8 gives us 30 characters per screen
 
-header = 10 #space for the first row / status bar / yellow region of OLED
+header = 10  # space for the first row / status bar / yellow region of OLED
 
 print("OLED Display test")
 display.fill(0)
@@ -107,54 +109,53 @@ time.sleep(0.1)
 
 print("OLED Display text test")
 try:
-	# Clear display.
-	display.fill(0)
-	display.show()
+    # Clear display.
+    display.fill(0)
+    display.show()
 
-	# Draw the text
-	draw.text((0, 0), "EyeHear activated!", font=tinyFont, fill=255)
-	display.image(image)
-	display.show()
-	time.sleep(1)
+    # Draw the text
+    draw.text((0, 0), "EyeHear activated!", font=tinyFont, fill=255)
+    display.image(image)
+    display.show()
+    time.sleep(1)
 except Error:
-	print("Display test failed ")
-	for i in range(11):
-    		display.rect(0, 0, int(w_delta * i), int(h_delta * i), 1)
-	display.show()
-	print(Error)
+    print("Display test failed ")
+    for i in range(11):
+        display.rect(0, 0, int(w_delta * i), int(h_delta * i), 1)
+    display.show()
+    print(Error)
 
 time.sleep(0.1)
 
+
 def displayRedText(oledText):
-#overlay text on top row before it goes green
-	draw = ImageDraw.Draw(image)
-	draw.rectangle((0, 0, display.width, header), outline=0, fill=0)
-	draw.text((0,0), oledText, font=tinyFont, fill=255)
-	display.image(image)
-	display.show()
-	#print("~") #debug oled
-	time.sleep(0.1)
+    # overlay text on top row before it goes green
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, display.width, header), outline=0, fill=0)
+    draw.text((0, 0), oledText, font=tinyFont, fill=255)
+    display.image(image)
+    display.show()
+    # print("~") #debug oled
+    time.sleep(0.1)
 
 
 def displayText(oledText):
-#	image = Image.new("1", (display.width, display.height))
-	#fill empty recntangle to clear the screen
-	draw = ImageDraw.Draw(image)
-	draw.rectangle((0, header, display.width -1, display.height -1), outline=1, fill=0)
-	draw.text((0,header), oledText, font=font, fill=255)
-	display.image(image)
-	display.show()
-#	print(".") #debug oled
-	time.sleep(0.1)
+    # image = Image.new("1", (display.width, display.height))
+    global header
+    draw = ImageDraw.Draw(image)
+    # fill empty recntangle to clear the screen
+    draw.rectangle(
+        (0, header, display.width - 1, display.height - 1), outline=1, fill=0
+    )
+    offset = header
+    lines = textwrap.wrap(oledText, width=26)
+    for line in lines:
+        draw.text((0, offset), line, font=font, fill=255)
+        offset += font.getsize(line)[1]
+    display.image(image)
+    display.show()
+    time.sleep(0.1)
 
-def spinSPinner():
-        x+=1
-        if x>7 : x=0
-        draw = ImageDraw.Draw(image)
-        draw.rectangle((0, 0, 4, header), outline=0, fill=0)
-        draw.text((0,0), SPINNER[x], font=tinyFont, fill=255)
-        display.image(image)
-        display.show()
 
 def get_current_time():
     """Return Current Time in MS."""
@@ -284,7 +285,7 @@ def listen_print_loop(responses, stream):
     the next result to overwrite it, until the response is a final one. For the
     final one, print a newline to preserve the finalized transcription.
     """
-    x=0
+    x = 0
     for response in responses:
 
         if get_current_time() - stream.start_time > STREAMING_LIMIT:
@@ -326,7 +327,7 @@ def listen_print_loop(responses, stream):
             sys.stdout.write("\033[K")
             sys.stdout.write(str(corrected_time) + ": " + transcript + "\n")
 
-#EyeHear update OLED display with transcript text
+            # EyeHear update OLED display with transcript text
             displayText(transcript)
 
             stream.is_final_end_time = stream.result_end_time
@@ -342,13 +343,13 @@ def listen_print_loop(responses, stream):
 
         else:
             sys.stdout.write(RED)
-            sys.stdout.write("\033[K" + " " + SPINNER[x] )
-            if x>=7:
-             x=0
+            sys.stdout.write("\033[K" + " " + SPINNER[x])
+            if x >= 7:
+                x = 0
             else:
-             x = x + 1 #todo replace with an iterator
+                x = x + 1  # todo replace with an iterator
             sys.stdout.write(str(corrected_time) + ": " + transcript + "\r")
-#EyeHear overlay red text until it goes green
+            # EyeHear overlay red text until it goes green
             displayRedText(transcript)
             stream.last_transcript_was_final = False
 
