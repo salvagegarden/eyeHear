@@ -1,6 +1,7 @@
 # IDE
 .vim/
 .idea/
+.vscode/
 
 # files
 *.log
@@ -15,3 +16,6 @@ __pycache__/
 output/
 dist/
 build/
+
+# Custom
+onstartup.py
