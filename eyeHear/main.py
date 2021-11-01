@@ -10,13 +10,20 @@ import google
 import pyaudio
 
 from draw import displayRedText, displayText
-from service import CHUNK_SIZE, SAMPLE_RATE, speech_regonize
+from service import (
+    CHUNK_SIZE,
+    DEVICE_INDEX,
+    PA_CHANNELS,
+    PA_FORMAT,
+    SAMPLE_RATE,
+    speech_regonize,
+)
 
 logging.basicConfig(
-     level=logging.INFO, 
-     format= '[%(asctime)s] %(levelname)s - %(message)s',
-     datefmt='%H:%M:%S'
- )
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s - %(message)s",
+    datefmt="%H:%M:%S",
+)
 logger = logging.getLogger("eyeHear")
 
 
@@ -32,24 +39,30 @@ def detect_volume():
         return math.sqrt(sum_squares / count)
 
     p = pyaudio.PyAudio()
-    stream = p.open(format = pyaudio.paInt16,
-            channels = 1,
-            rate = SAMPLE_RATE,
-            input = True,
-            frames_per_buffer = CHUNK_SIZE)
+    stream = p.open(
+        format=PA_FORMAT,
+        input_device_index=DEVICE_INDEX,
+        channels=PA_CHANNELS,
+        rate=SAMPLE_RATE,
+        input=True,
+        frames_per_buffer=CHUNK_SIZE,
+    )
 
     while True:
         result = rms(stream.read(CHUNK_SIZE))
-        if result > 0.0015:
-            break
+        # Todo: fix rms detecting
+        print(result)
+        break
+        # if result > 0.5015:
+        # break
     stream.close()
 
 
 def detect_internet():
     try:
-        urlopen('https://google.com', timeout=5)
+        urlopen("https://google.com", timeout=5)
         return True
-    except Exception as err: 
+    except Exception as err:
         logger.warning(f"Network error: {err}")
         return False
 
