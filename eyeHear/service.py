@@ -34,14 +34,27 @@ from draw import displayRedText, displayText
 PA_FORMAT = pyaudio.paFloat32
 PA_CHANNELS = 1
 STREAMING_LIMIT = 240000  # 4 minutes
-SAMPLE_RATE = 48000  # 16000
-CHUNK_SIZE = 4096  # int(SAMPLE_RATE / 10)  # 100ms
+SAMPLE_RATE = 48000
+CHUNK_SIZE = 4800
+# SAMPLE_RATE = 48000
+# CHUNK_SIZE = 4096  # int(SAMPLE_RATE / 10)  # 100ms
 DEVICE_INDEX = 1  # None
 
 RED = "\033[0;31m"
 GREEN = "\033[0;32m"
 YELLOW = "\033[0;33m"
 SPINNER = ["⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"]  # listener indicator = 8 frames
+
+
+def parse_to_int16(chunk):
+    if PA_FORMAT == pyaudio.paFloat32:
+        _chunk = np.frombuffer(chunk, dtype="<f4")
+        _chunk = np.copy(_chunk)
+        _chunk /= 1.414
+        _chunk *= 32767
+        _chunk = _chunk.astype(np.int16)
+        return _chunk.tobytes()
+    return chunk
 
 
 def get_current_time():
@@ -283,7 +296,7 @@ def speech_regonize():
             audio_generator = stream.generate()
 
             displayRedText("EyeHear ready:")
-            displayText(" Try it!")
+            displayText("Try it!")
             requests = (
                 speech.StreamingRecognizeRequest(audio_content=content)
                 for content in audio_generator

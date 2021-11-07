@@ -42,7 +42,6 @@ display = TFT.ST7789(
 
 # Initialize display.
 display.begin()
-
 # Clear display.
 display.clear()
 
@@ -54,9 +53,9 @@ draw = ImageDraw.Draw(image)
 
 # font setting
 # font = ImageFont.load_default()
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 20)
+font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 18)
 header_font = ImageFont.truetype(
-    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 22
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 20
 )
 header = header_font.getsize("0")[1] + 10
 line_width = int(width / font.getsize("0")[0])
@@ -85,7 +84,8 @@ def displayRedText(oledText):
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, display.width, header), outline=0, fill=0)
 
-    draw.text((0, 0), oledText[-header_width:], font=header_font, fill=(220, 220, 0, 0))
+    text = oledText.strip()
+    draw.text((0, 0), text[-header_width:], font=header_font, fill=(220, 220, 0, 0))
     display.image(image)
     # display.show()
     # print("~") #debug oled
@@ -101,7 +101,7 @@ def displayText(oledText):
         (0, header, display.width - 1, display.height - 1), outline=1, fill=0
     )
     offset = header
-    lines = textwrap.wrap(oledText, width=line_width)
+    lines = textwrap.wrap(oledText.strip(), width=line_width)
     for line in lines:
         draw.text((0, offset), line, font=font, fill=(0, 220, 255, 0))
         offset += font.getsize(line)[1]
