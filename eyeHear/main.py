@@ -114,8 +114,8 @@ def main():
     cmd = "hostname -I | cut -d' ' -f1"
     IP = subprocess.check_output(cmd, shell=True).decode("utf-8")
     while True:
+        displayRedText(f"IP: {IP}")
         displayRedText("Waiting to start...")
-        displayText(f"IP: {IP}")
         detect_volume()
         stream_loop()
 

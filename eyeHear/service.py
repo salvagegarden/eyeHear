@@ -258,7 +258,7 @@ def listen_print_loop(responses, stream):
                 x = x + 1  # todo replace with an iterator
             sys.stdout.write(str(corrected_time) + ": " + transcript + "\r")
             # EyeHear overlay red text until it goes green
-            displayRedText(transcript)
+            displayRedText(transcript, stream.last_transcript_was_final)
             stream.last_transcript_was_final = False
 
 
