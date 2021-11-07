@@ -23,6 +23,7 @@ import re
 import sys
 import time
 
+import numpy as np
 import pyaudio
 from google.cloud import speech
 from six.moves import queue
@@ -30,9 +31,12 @@ from six.moves import queue
 from draw import displayRedText, displayText
 
 # Audio recording parameters
+PA_FORMAT = pyaudio.paFloat32
+PA_CHANNELS = 1
 STREAMING_LIMIT = 240000  # 4 minutes
-SAMPLE_RATE = 16000
-CHUNK_SIZE = int(SAMPLE_RATE / 10)  # 100ms
+SAMPLE_RATE = 48000  # 16000
+CHUNK_SIZE = 4096  # int(SAMPLE_RATE / 10)  # 100ms
+DEVICE_INDEX = 1  # None
 
 RED = "\033[0;31m"
 GREEN = "\033[0;32m"
@@ -66,11 +70,12 @@ class ResumableMicrophoneStream:
         self.new_stream = True
         self._audio_interface = pyaudio.PyAudio()
         self._audio_stream = self._audio_interface.open(
-            format=pyaudio.paInt16,
-            channels=self._num_channels,
+            format=PA_FORMAT,
+            channels=PA_CHANNELS,
             rate=self._rate,
             input=True,
             frames_per_buffer=self.chunk_size,
+            input_device_index=DEVICE_INDEX,
             # Run the audio stream asynchronously to fill the buffer object.
             # This is necessary so that the input device's buffer doesn't
             # overflow while the calling thread makes network requests, etc.
@@ -105,7 +110,6 @@ class ResumableMicrophoneStream:
             data = []
 
             if self.new_stream and self.last_audio_input:
-
                 chunk_time = STREAMING_LIMIT / len(self.last_audio_input)
 
                 if chunk_time != 0:
@@ -134,10 +138,19 @@ class ResumableMicrophoneStream:
             # data, and stop iteration if the chunk is None, indicating the
             # end of the audio stream.
             chunk = self._buff.get()
+
             self.audio_input.append(chunk)
 
             if chunk is None:
                 return
+            else:
+                if PA_FORMAT == pyaudio.paFloat32:
+                    _chunk = np.frombuffer(chunk, dtype="<f4")
+                    _chunk = np.copy(_chunk)
+                    _chunk /= 1.414
+                    _chunk *= 32767
+                    _chunk = _chunk.astype(np.int16)
+                    chunk = _chunk.tobytes()
             data.append(chunk)
             # Now consume whatever other data's still buffered.
             while True:
@@ -292,4 +305,6 @@ def speech_regonize():
             if not stream.last_transcript_was_final:
                 sys.stdout.write("\n")
             stream.new_stream = True
+
+
 # [END speech_transcribe_infinite_streaming]

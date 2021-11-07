@@ -12,6 +12,7 @@ A techForGood project to display speech-to-text on a wearable low-cost device.
 ```bash
 sudo apt-get update
 sudo apt-get install -y build-essential python-dev python-rpi.gpio python-spidev python-pip python-pil python-numpy
+sudo apt install libportaudio2
 ```
 
 </details>
