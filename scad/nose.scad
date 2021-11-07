@@ -1,6 +1,7 @@
 use <shapes_lib.scad>
 use <tools_lib.scad>
 
+$fn=100;
 r=25; //chopstick radius
 
 
@@ -24,8 +25,8 @@ module nose() {
       }
     }
     translate([40,340,40]) rotate([0,90,0]) cylinder(170,r,r);
-    translate([125,380,0]) screw8_hole();
-    #translate([25,363,35]) cube([200,60,10]);
+    #translate([125,380,0]) screw8_hole();
+    translate([25,363,35]) cube([200,60,10]);
   }
 }
 

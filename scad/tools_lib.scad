@@ -7,6 +7,29 @@ translate([100,0,0]) screw4_hole();
 
 translate([100,100,0]) screw4();
 
+translate([200,0,0]) m2_50_hole();
+
+translate([200,100,0]) m2_50();
+
+module m2_50() {
+  color("Silver") {
+    union() {
+      cylinder(100,10,10);
+      cylinder(20,20,20);
+      translate([0,0,20]) cylinder(5,40,40);
+      translate([0,0,75]) cylinder(5,40,40);
+      translate([0,0,80]) cylinder(20,20,20);
+    }
+  }
+}
+
+module m2_50_hole() {
+    union() {
+      cylinder(100,11,11);
+      translate([0,0,75]) cylinder(80,40,40);
+      translate([0,0,-55]) cylinder(80,40,40);
+    }
+}
 
 module screw8_hole() {
   // screw protrudes 5 clearance

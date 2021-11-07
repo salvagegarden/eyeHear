@@ -9,6 +9,22 @@ translate([300,0,0]) edged_cube(100, 200, 50,10);
 %translate([300,0,0]) cube([100, 200, 50]);
 
 
+module board_cutout(l,w,h,r) {
+  difference() {
+    union(){
+      translate([r,r,0]) cube([l-2*r,w-2*r,h]);
+      translate([2*r,0,0]) cube([l-4*r,r,h]);
+      translate([2*r,w-r,0]) cube([l-4*r,r,h]);
+      translate([0,2*r,0]) cube([r,w-4*r,h]);
+      translate([l-r,2*r,0]) cube([r,w-4*r,h]);
+    }
+    translate([r,r,0]) cylinder(h+1,r,r);
+    translate([l-r,r,0]) cylinder(h+1,r,r);
+    translate([r,w-r,0]) cylinder(h+1,r,r);
+    translate([l-r,w-r,0]) cylinder(h+1,r,r);
+  }
+}
+
 module rounded_hole(h=100, r=50, c=10) {
   difference() {
     union() {
