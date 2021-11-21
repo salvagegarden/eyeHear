@@ -16,6 +16,7 @@ from service import (
     PA_CHANNELS,
     PA_FORMAT,
     SAMPLE_RATE,
+    parse_to_int16,
     speech_regonize,
 )
 
@@ -48,13 +49,14 @@ def detect_volume():
         frames_per_buffer=CHUNK_SIZE,
     )
 
+    for _ in range(5):
+        stream.read(CHUNK_SIZE)
     while True:
-        result = rms(stream.read(CHUNK_SIZE))
-        # Todo: fix rms detecting
-        print(result)
-        break
-        # if result > 0.5015:
-        # break
+        data = parse_to_int16(stream.read(CHUNK_SIZE))
+        result = rms(data)
+        # print("RMS: ", result)
+        if result > 0.04:
+            break
     stream.close()
 
 
@@ -112,8 +114,8 @@ def main():
     cmd = "hostname -I | cut -d' ' -f1"
     IP = subprocess.check_output(cmd, shell=True).decode("utf-8")
     while True:
+        displayRedText(f"IP: {IP}")
         displayRedText("Waiting to start...")
-        displayText(f"IP: {IP}")
         detect_volume()
         stream_loop()
 
