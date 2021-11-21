@@ -5,7 +5,16 @@ $fn=100;
 r=25; //chopstick radius
 
 
-nose();
+difference() {
+  nose();
+  translate([25,300,40]) cube([200,140,60]);
+}
+
+difference() {
+  translate([-400,-200,-40]) nose();
+  translate([-375,100,-60]) cube([200,140,60]);
+  translate([-450,-300,-60]) cube([400,400,150]);
+}
 
 
 module nose() {
