@@ -4,9 +4,8 @@ import time
 import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
-
 import ST7789 as TFT
+from PIL import Image, ImageDraw, ImageFont
 
 # Raspberry Pi pin configuration:
 RST = 25
@@ -80,7 +79,7 @@ def draw_rotated_text(image, text, position, angle, font, fill=(255, 255, 255)):
     image.paste(rotated, position, rotated)
 
 
-text_buffer = ["EyeHear Ready"]
+text_buffer = ["$ eyeHear starting"]
 
 
 def displayRedText(oledText, new_line=True):

@@ -1,24 +1,16 @@
 #!/usr/bin/env python
 import logging
-import math
-import struct
 import subprocess
 import time
-from urllib.request import urlopen
 
 import google
-import pyaudio
+import keyboard
 
-from draw import displayRedText, displayText
-from service import (
-    CHUNK_SIZE,
-    DEVICE_INDEX,
-    PA_CHANNELS,
-    PA_FORMAT,
-    SAMPLE_RATE,
-    parse_to_int16,
-    speech_regonize,
-)
+from services.draw import displayRedText, displayText
+from services.interaction import ask_wifi
+from services.sound import detect_volume
+from services.speech import speech_regonize
+from services.wifi import connect_to_wifi, detect_internet
 
 logging.basicConfig(
     level=logging.INFO,
@@ -26,47 +18,6 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger("eyeHear")
-
-
-def detect_volume():
-    def rms(data):
-        count = len(data) / 2
-        v_format = f"{int(count)}h"
-        shorts = struct.unpack(v_format, data)
-        sum_squares = 0.0
-        for sample in shorts:
-            n = sample * (1.0 / 32768)
-            sum_squares += n * n
-        return math.sqrt(sum_squares / count)
-
-    p = pyaudio.PyAudio()
-    stream = p.open(
-        format=PA_FORMAT,
-        input_device_index=DEVICE_INDEX,
-        channels=PA_CHANNELS,
-        rate=SAMPLE_RATE,
-        input=True,
-        frames_per_buffer=CHUNK_SIZE,
-    )
-
-    for _ in range(5):
-        stream.read(CHUNK_SIZE)
-    while True:
-        data = parse_to_int16(stream.read(CHUNK_SIZE))
-        result = rms(data)
-        # print("RMS: ", result)
-        if result > 0.04:
-            break
-    stream.close()
-
-
-def detect_internet():
-    try:
-        urlopen("https://google.com", timeout=5)
-        return True
-    except Exception as err:
-        logger.warning(f"Network error: {err}")
-        return False
 
 
 def stream_loop():
@@ -96,26 +47,48 @@ def stream_loop():
         time.sleep(3)
 
 
+def setup_wifi():
+    ssid = ""
+    password = ""
+
+    def func(key):
+        global ssid
+        if key.name == "enter":
+            return
+        else:
+            ssid += key.name
+
+    keyboard.on_press(func)
+    displayText("SSID:", ssid)
+    while True:
+        time.sleep(0.1)
+
+
 def main():
     logger.info(f"Detecting network...")
-    displayRedText("Detecting connection...")
+    displayRedText("$ Connecting Wi-Fi...")
 
-    retry = 20
+    retry = 10
     while retry > 0:
         has_connection = detect_internet()
         if has_connection:
             break
         else:
-            displayText(f"Connection failed, retry {retry}")
+            displayText(f"$ Connection failed, retry {retry}")
             time.sleep(2)
         retry -= 1
+
+    if not has_connection:
+        wifi_config = ask_wifi()
+        if wifi_config is not None:
+            connect_to_wifi(wifi_config[0], wifi_config[1])
 
     # Get current IP address
     cmd = "hostname -I | cut -d' ' -f1"
     IP = subprocess.check_output(cmd, shell=True).decode("utf-8")
     while True:
-        displayRedText(f"IP: {IP}")
-        displayRedText("Waiting to start...")
+        displayRedText(f"$ IP: {IP}")
+        displayRedText("$ Waiting to start...")
         detect_volume()
         stream_loop()
 

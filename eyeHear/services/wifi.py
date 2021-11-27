@@ -1,0 +1,71 @@
+# from wifi import Cell, Scheme
+
+# ssids = [cell.ssid for cell in Cell.all("wlan0")]
+# print("ssids", ssids)
+
+# schemes = list(Scheme.all())
+# print("schemes", schemes)
+
+
+# for scheme in schemes:
+#     ssid = scheme.options.get("wpa-ssid", scheme.options.get("wireless-essid"))
+#     if ssid in ssids:
+#         print("Connecting to %s" % ssid)
+#         scheme.activate()
+#         break
+
+
+# def connect_to_wifi(ssid: str, passwd: str):
+#     scheme = Scheme.for_cell("wlan0", "eyeHear", ssid, passwd)
+#     scheme.save()
+#     scheme.activate()
+
+import logging
+import subprocess
+import time
+from urllib.request import urlopen
+
+import pywifi
+from pywifi import const
+
+from services.draw import displayRedText, displayText
+
+wifi = pywifi.PyWiFi()
+logger = logging.getLogger("eyeHear")
+
+ifaces = wifi.interfaces()
+wifi_iface = None
+for i in ifaces:
+    if i.name() == "wlan0":
+        wifi_iface = i
+
+
+def connect_to_wifi(ssid: str, passwd: str):
+    profile = pywifi.Profile()
+    profile.ssid = ssid
+    profile.auth = const.AUTH_ALG_OPEN
+    profile.akm.append(const.AKM_TYPE_WPA2PSK)
+    profile.cipher = const.CIPHER_TYPE_CCMP
+    profile.key = passwd
+    tmp_profile = wifi_iface.add_network_profile(profile)
+    displayRedText(f"$ Connect {ssid}")
+    wifi_iface.connect(tmp_profile)
+
+    for _ in range(5):
+        time.sleep(4)
+        if wifi_iface.status() == const.IFACE_CONNECTED:
+            displayRedText(f"$ Connected: {ssid}")
+            break
+
+
+def detect_internet():
+    try:
+        urlopen("https://google.com", timeout=5)
+    except Exception as err:
+        logger.warning(f"Network error: {err}")
+        return False
+    else:
+        cmd = "iwgetid -r"
+        ssid = subprocess.check_output(cmd, shell=True).decode("utf-8")
+        displayRedText(f"$ WiFi: {ssid}")
+        return True

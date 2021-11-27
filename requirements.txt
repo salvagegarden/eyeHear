@@ -2,3 +2,6 @@ google-cloud-speech==2.9.3
 PyAudio==0.2.11
 # adafruit-circuitpython-ssd1306==2.12.1
 Adafruit-GPIO==1.0.3
+
+keyboard==0.13.5
+wifi==0.3.8
