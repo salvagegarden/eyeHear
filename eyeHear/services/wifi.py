@@ -1,25 +1,3 @@
-# from wifi import Cell, Scheme
-
-# ssids = [cell.ssid for cell in Cell.all("wlan0")]
-# print("ssids", ssids)
-
-# schemes = list(Scheme.all())
-# print("schemes", schemes)
-
-
-# for scheme in schemes:
-#     ssid = scheme.options.get("wpa-ssid", scheme.options.get("wireless-essid"))
-#     if ssid in ssids:
-#         print("Connecting to %s" % ssid)
-#         scheme.activate()
-#         break
-
-
-# def connect_to_wifi(ssid: str, passwd: str):
-#     scheme = Scheme.for_cell("wlan0", "eyeHear", ssid, passwd)
-#     scheme.save()
-#     scheme.activate()
-
 import logging
 import subprocess
 import time
