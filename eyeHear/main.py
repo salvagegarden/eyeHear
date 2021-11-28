@@ -68,20 +68,23 @@ def main():
     logger.info(f"Detecting network...")
     displayRedText("$ Connecting Wi-Fi...")
 
-    retry = 10
+    retry = 15
     while retry > 0:
         has_connection = detect_internet()
         if has_connection:
             break
         else:
             displayText(f"$ Connection failed, retry {retry}")
-            time.sleep(2)
+            time.sleep(1)
         retry -= 1
 
-    if not has_connection:
+    is_connected = has_connection
+    while is_connected is False:
         wifi_config = ask_wifi()
         if wifi_config is not None:
-            connect_to_wifi(wifi_config[0], wifi_config[1])
+            is_connected = connect_to_wifi(wifi_config[0], wifi_config[1])
+        else:
+            break
 
     # Get current IP address
     cmd = "hostname -I | cut -d' ' -f1"

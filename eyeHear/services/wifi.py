@@ -18,7 +18,7 @@ for i in ifaces:
         wifi_iface = i
 
 
-def connect_to_wifi(ssid: str, passwd: str):
+def connect_to_wifi(ssid: str, passwd: str) -> bool:
     profile = pywifi.Profile()
     profile.ssid = ssid
     profile.auth = const.AUTH_ALG_OPEN
@@ -33,7 +33,9 @@ def connect_to_wifi(ssid: str, passwd: str):
         time.sleep(4)
         if wifi_iface.status() == const.IFACE_CONNECTED:
             displayRedText(f"$ Connected: {ssid}")
-            break
+            time.sleep(5)
+            return True
+    return False
 
 
 def detect_internet():
