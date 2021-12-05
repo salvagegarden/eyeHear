@@ -7,9 +7,9 @@ from services.draw import displayRedText, displayText
 
 
 def ask_wifi():
-    displayRedText("$ Setup Wi-Fi? y/n")
+    displayRedText("$ Setup Wi-Fi? Y/n")
     records = keyboard.record(until="enter")
-    if "y" in list(keyboard.get_typed_strings(records))[-1]:
+    if "y" in "".join(list(keyboard.get_typed_strings(records))):
         displayRedText("Wi-Fi SSID: ")
         displayRedText("> ")
         ssid = input_line()
@@ -32,11 +32,11 @@ def input_line():
             if e.name == "enter":
                 break
 
-    t = threading.Thread(record)
+    t = threading.Thread(target=record)
     t.start()
 
     while True:
-        time.sleep(0.5)
+        time.sleep(0.1)
         lines = list(keyboard.get_typed_strings(events))
         line = lines[0]
         displayText(f"> {line}")

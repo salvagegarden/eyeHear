@@ -39,8 +39,9 @@ def detect_volume():
     while True:
         data = parse_to_int16(stream.read(CHUNK_SIZE))
         result = rms(data)
-        # print("RMS: ", result)
-        if result > 0.04:
+        print("RMS: ", result)
+        # if result > 0.04:
+        if True:
             break
     stream.close()
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+import os
 import subprocess
 import time
 
@@ -12,6 +13,9 @@ from services.sound import detect_volume
 from services.speech import speech_regonize
 from services.wifi import connect_to_wifi, detect_internet
 
+os.environ[
+    "GOOGLE_APPLICATION_CREDENTIALS"
+] = "/home/pi/engineering-good-1569744069426-f14580c084fd.json"
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s - %(message)s",

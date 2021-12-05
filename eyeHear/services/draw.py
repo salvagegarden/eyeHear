@@ -79,7 +79,7 @@ def draw_rotated_text(image, text, position, angle, font, fill=(255, 255, 255)):
     image.paste(rotated, position, rotated)
 
 
-text_buffer = ["$ eyeHear starting"]
+text_buffer = ["$ EyeHear starting"]
 
 
 def displayRedText(oledText, new_line=True):
